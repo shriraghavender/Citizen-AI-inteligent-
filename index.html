@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CitizenAI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="hero-panel">
+      <div class="brand-row">
+        <div class="logo-mark">CA</div>
+        <div>
+          <div class="eyebrow">CitizenAI</div>
+          <h1>Smart locker for citizen data</h1>
+        </div>
+      </div>
+
+      <p class="hero-copy">
+        Store your details from text or files, ask questions later, and see the important parts in one clear view.
+        Everything is kept in your browser using local storage.
+      </p>
+
+      <div class="status-card">
+        <div class="status-dot" id="aiStatusDot"></div>
+        <div>
+          <div class="status-label">AI engine</div>
+          <div class="status-value" id="aiStatusText">Initializing…</div>
+        </div>
+      </div>
+
+      <div class="quick-help">
+        <h2>Try asking</h2>
+        <div class="chip-row">
+          <button class="chip" data-prompt="Summarize everything you know about me.">Summarize me</button>
+          <button class="chip" data-prompt="What is my name, email, and phone number?"><span>Find contact</span></button>
+          <button class="chip" data-prompt="What important topics appear in my files?">Topics</button>
+          <button class="chip" data-prompt="Show any dates, IDs, or references you stored.">Dates and IDs</button>
+        </div>
+      </div>
+
+      <div class="mini-stats" id="miniStats"></div>
+    </aside>
+
+    <main class="workspace">
+      <header class="topbar">
+        <div class="tabs" role="tablist" aria-label="CitizenAI sections">
+          <button class="tab active" role="tab" aria-selected="true" data-tab="chatTab">Chat</button>
+          <button class="tab" role="tab" aria-selected="false" data-tab="dataTab">Data Understanding</button>
+          <button class="tab" role="tab" aria-selected="false" data-tab="vizTab">Visualization</button>
+        </div>
+        <div class="toolbar">
+          <button class="ghost-btn" id="exportBtn">Export Data</button>
+          <button class="ghost-btn" id="clearBtn">Clear Locker</button>
+        </div>
+      </header>
+
+      <section class="panel active" id="chatTab" role="tabpanel">
+        <div class="panel-header">
+          <div>
+            <h2>Chat with your locker</h2>
+            <p>Send a message, paste details, or upload files. CitizenAI will remember and answer from stored context.</p>
+          </div>
+          <div class="pill">Private • Local • Persistent</div>
+        </div>
+
+        <div class="chat-window" id="chatWindow" aria-live="polite"></div>
+
+        <div class="composer">
+          <label class="upload-zone" id="uploadZone" for="fileInput">
+            <input type="file" id="fileInput" multiple accept=".txt,.md,.csv,.json,text/plain,application/json,text/csv" />
+            <div class="upload-icon">⤴</div>
+            <div>
+              <strong>Attach files</strong>
+              <span>TXT, MD, CSV, JSON</span>
+            </div>
+          </label>
+
+          <div class="input-group">
+            <textarea id="messageInput" rows="3" placeholder="Tell CitizenAI something to remember or ask a question about your stored data…"></textarea>
+            <div class="composer-actions">
+              <div class="hint">Press Enter to send, Shift+Enter for a new line.</div>
+              <button class="send-btn" id="sendBtn">Send</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" id="dataTab" role="tabpanel">
+        <div class="panel-header">
+          <div>
+            <h2>Data understanding</h2>
+            <p>See a clean summary, inspect stored entries, and review the data library in one place.</p>
+          </div>
+          <div class="pill" id="libraryCountPill">0 items stored</div>
+        </div>
+
+        <div class="summary-grid" id="summaryGrid"></div>
+
+        <div class="library-section">
+          <div class="library-header">
+            <input id="librarySearch" type="search" placeholder="Search stored data…" />
+            <select id="libraryFilter">
+              <option value="all">All types</option>
+              <option value="message">Messages</option>
+              <option value="file">Files</option>
+            </select>
+          </div>
+          <div class="library-list" id="libraryList"></div>
+        </div>
+      </section>
+
+      <section class="panel" id="vizTab" role="tabpanel">
+        <div class="panel-header">
+          <div>
+            <h2>Visualization</h2>
+            <p>Single-view charts that make the stored data easy to understand at a glance.</p>
+          </div>
+          <div class="pill">Live from your locker</div>
+        </div>
+
+        <div class="viz-grid">
+          <div class="viz-card wide">
+            <div class="card-title">Data type balance</div>
+            <svg id="typeChart" viewBox="0 0 320 220" class="viz-svg" aria-label="Data type chart"></svg>
+          </div>
+          <div class="viz-card">
+            <div class="card-title">Top themes</div>
+            <div id="themeBars" class="bars"></div>
+          </div>
+          <div class="viz-card">
+            <div class="card-title">Activity timeline</div>
+            <div id="timeline" class="timeline"></div>
+          </div>
+          <div class="viz-card">
+            <div class="card-title">Data clarity score</div>
+            <div class="score-ring" id="scoreRing">
+              <div class="score-ring-inner">
+                <span id="clarityScore">0</span>
+                <small>clarity</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <template id="chatMessageTemplate">
+    <div class="message">
+      <div class="avatar"></div>
+      <div class="bubble">
+        <div class="message-meta"></div>
+        <div class="message-text"></div>
+      </div>
+    </div>
+  </template>
+
+  <script type="module" src="script.js"></script>
+</body>
+</html>
